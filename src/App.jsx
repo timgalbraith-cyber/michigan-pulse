@@ -268,6 +268,17 @@ export default function MichiganPulse() {
   const [authName, setAuthName] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [cartoonUrl, setCartoonUrl] = useState(null);
+
+  const CARTOONS = [
+    "https://res.cloudinary.com/dgczdb1um/video/upload/v1778623522/2026-05-12_16_49_45_swnqta.mp4",
+    "https://res.cloudinary.com/dgczdb1um/video/upload/v1778623529/2026-05-12_16_39_22_ibdjyn.mp4",
+  ];
+
+  const showRandomCartoon = () => {
+    const url = CARTOONS[Math.floor(Math.random() * CARTOONS.length)];
+    setCartoonUrl(url);
+  };
 
   useEffect(() => {
     (async () => {
@@ -372,6 +383,7 @@ export default function MichiganPulse() {
       if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
       loadUserVotes(uData.id, token);
       setAuthModal(false);
+      showRandomCartoon();
     } catch(e) { setAuthError('Connection error. Please try again.'); }
     setAuthLoading(false);
     setAuthEmail(''); setAuthPass(''); setAuthName(''); setAuthError('');
@@ -856,6 +868,23 @@ export default function MichiganPulse() {
               {authTab==='login' ? "Don't have an account? " : "Already have an account? "}
               <span style={{color:BLUE,cursor:"pointer",fontWeight:600}} onClick={()=>{setAuthTab(authTab==='login'?'signup':'login');setAuthError('');}}>{authTab==='login'?'Sign up':'Sign in'}</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* CARTOON MODAL */}
+      {cartoonUrl && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.85)",backdropFilter:"blur(10px)"}}>
+          <div style={{position:"relative",borderRadius:16,overflow:"hidden",boxShadow:"0 0 60px #00aaff33",border:`1px solid ${BLUE}33`}}>
+            <video
+              src={cartoonUrl}
+              autoPlay
+              muted={false}
+              playsInline
+              style={{display:"block",maxWidth:"90vw",maxHeight:"80vh",borderRadius:16}}
+              onEnded={()=>setCartoonUrl(null)}
+            />
+            <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${BLUE},${GREEN})`}}/>
           </div>
         </div>
       )}
