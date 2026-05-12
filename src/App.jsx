@@ -383,14 +383,19 @@ export default function MichiganPulse() {
       if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
       loadUserVotes(uData.id, token);
       setAuthModal(false);
-      showRandomCartoon();
+      setTimeout(() => showRandomCartoon(), 300);
     } catch(e) { setAuthError('Connection error. Please try again.'); }
     setAuthLoading(false);
     setAuthEmail(''); setAuthPass(''); setAuthName(''); setAuthError('');
   };
 
   const handleSocialAuth = async (provider) => {
-    setAuthError(`${provider === 'google' ? 'Google' : 'Apple'} sign-in requires the hosted app. Use email for now.`);
+    if (provider === 'google') {
+      const redirectTo = encodeURIComponent('https://michiganpulse.net');
+      window.location.href = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${redirectTo}`;
+    } else {
+      setAuthError('Apple sign-in coming soon. Use email or Google for now.');
+    }
   };
 
   const handleSignOut = async () => {
@@ -879,11 +884,12 @@ export default function MichiganPulse() {
             <video
               src={cartoonUrl}
               autoPlay
-              muted={false}
               playsInline
               style={{display:"block",maxWidth:"90vw",maxHeight:"80vh",borderRadius:16}}
               onEnded={()=>setCartoonUrl(null)}
+              ref={el => el && el.play().catch(()=>{})}
             />
+            <button onClick={()=>setCartoonUrl(null)} style={{position:"absolute",top:10,right:10,background:"rgba(0,0,0,.5)",border:"none",color:"#fff",fontSize:18,width:30,height:30,borderRadius:"50%",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
             <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${BLUE},${GREEN})`}}/>
           </div>
         </div>
