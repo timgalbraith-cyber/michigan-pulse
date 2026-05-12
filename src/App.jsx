@@ -119,7 +119,7 @@ const partyLabel = (p) => p === "D" ? "Democrat" : p === "R" ? "Republican" : "N
 const scoreColor = (s) => s >= 60 ? GREEN : s >= 40 ? "#f59e0b" : "#ff4d4d";
 const sentColor = (s) => s === "positive" ? GREEN : s === "negative" ? "#ff4d4d" : s === "mixed" ? "#f59e0b" : "#888";
 
-const Logo = ({ size = 44 }) => ( <img src="/logo.png" alt="Michigan Pulse" width={size} height={size} style={{ objectFit: "contain", display: "block" }} /> );
+const Logo = ({ size = 44 }) => ( <img src="const Logo = ({ size = 44 }) => ( <img src="/ChatGPT_Image_May_11__2026__01_13_56_PM.png"" alt="Michigan Pulse" width={size} height={size} style={{ objectFit: "contain", display: "block" }} /> );
 
 export default function MichiganPulse() {
   const [votes, setVotes] = useState({});        // { "official_cat": { total, count } }
