@@ -283,11 +283,33 @@ export default function MichiganPulse() {
   useEffect(() => {
     (async () => {
       try {
-        const savedUser = await window.storage.get('mi_sb_user').catch(()=>null);
-        if (savedUser) {
-          const u = JSON.parse(savedUser.value);
-          setUser(u);
-          loadUserVotes(u.id, u.token);
+        // Check for OAuth callback token in URL hash
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+          const params = new URLSearchParams(hash.replace('#', ''));
+          const token = params.get('access_token');
+          if (token) {
+            const uData = await sb.auth.getUser(token);
+            if (uData && uData.id) {
+              const name = uData.user_metadata?.name || uData.email?.split('@')[0] || 'User';
+              const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token };
+              setUser(newUser);
+              await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
+              if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
+              loadUserVotes(uData.id, token);
+              // Clean up URL
+              window.history.replaceState(null, '', window.location.pathname);
+              setTimeout(() => showRandomCartoon(), 500);
+            }
+          }
+        } else {
+          // Load persisted session
+          const savedUser = await window.storage.get('mi_sb_user').catch(()=>null);
+          if (savedUser) {
+            const u = JSON.parse(savedUser.value);
+            setUser(u);
+            loadUserVotes(u.id, u.token);
+          }
         }
         await loadAllVotes();
         await loadAllComments();
