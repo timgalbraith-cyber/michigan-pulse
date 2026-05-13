@@ -300,7 +300,7 @@ export default function MichiganPulse() {
               const name = uData.user_metadata?.name || uData.email?.split('@')[0] || 'User';
               const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token };
               setUser(newUser);
-              await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
+              try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
               if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
               loadUserVotes(uData.id, token);
               // Clean up URL
@@ -311,7 +311,7 @@ export default function MichiganPulse() {
           }
         } else {
           // Load persisted session
-          const savedUser = await window.storage.get('mi_sb_user').catch(()=>null);
+          const savedUser = await Promise.resolve(localStorage.getItem('mi_sb_user') ? {value: localStorage.getItem('mi_sb_user')} : null);
           if (savedUser) {
             const u = JSON.parse(savedUser.value);
             setUser(u);
@@ -408,7 +408,7 @@ export default function MichiganPulse() {
       const name = uData.user_metadata?.name || authEmail.split('@')[0];
       const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token };
       setUser(newUser);
-      await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
+      try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
       if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
       loadUserVotes(uData.id, token);
       await loadAllVotes();
@@ -431,7 +431,7 @@ export default function MichiganPulse() {
   const handleSignOut = async () => {
     if (user?.token) await sb.auth.signOut(user.token).catch(()=>{});
     setUser(null); setUserVotes({});
-    await window.storage.delete('mi_sb_user').catch(()=>{});
+    try { localStorage.removeItem('mi_sb_user'); } catch(e) {}
   };
 
   const requireAuth = () => {
