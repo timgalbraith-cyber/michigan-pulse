@@ -3,30 +3,36 @@ import { useState, useEffect } from "react";
 const SUPABASE_URL = "https://znljkqtbqlxecmzebsmi.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpubGprcXRicWx4ZWNtemVic21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MjAxMjksImV4cCI6MjA5NDA5NjEyOX0.fpjnsZCwfxHHxEo2WV8BlXTxhTT2XPzUmPNjWZu01eg";
 
+const sbHeaders = (token) => ({
+  "apikey": SUPABASE_KEY,
+  "Authorization": `Bearer ${token || SUPABASE_KEY}`,
+  "Content-Type": "application/json",
+  "Prefer": "return=representation"
+});
+
 const sb = {
-  headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=representation" },
-  from: (table) => ({
+  from: (table, token) => ({
     select: async (cols = "*", opts = {}) => {
       let url = `${SUPABASE_URL}/rest/v1/${table}?select=${cols}`;
       if (opts.filter) url += `&${opts.filter}`;
       if (opts.order) url += `&order=${opts.order}`;
-      const r = await fetch(url, { headers: sb.headers });
+      const r = await fetch(url, { headers: sbHeaders(token) });
       return r.json();
     },
     upsert: async (data) => {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: "POST", headers: { ...sb.headers, "Prefer": "resolution=merge-duplicates,return=representation" }, body: JSON.stringify(data) });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: "POST", headers: { ...sbHeaders(token), "Prefer": "resolution=merge-duplicates,return=representation" }, body: JSON.stringify(data) });
       return r.json();
     },
     insert: async (data) => {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: "POST", headers: sb.headers, body: JSON.stringify(data) });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: "POST", headers: sbHeaders(token), body: JSON.stringify(data) });
       return r.json();
     },
     update: async (data, filter) => {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, { method: "PATCH", headers: sb.headers, body: JSON.stringify(data) });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, { method: "PATCH", headers: sbHeaders(token), body: JSON.stringify(data) });
       return r.json();
     },
     delete: async (filter) => {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, { method: "DELETE", headers: sb.headers });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, { method: "DELETE", headers: sbHeaders(token) });
       return r.ok;
     },
   }),
@@ -295,7 +301,7 @@ export default function MichiganPulse() {
               const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token };
               setUser(newUser);
               await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
-              if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
+              if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
               loadUserVotes(uData.id, token);
               // Clean up URL
               window.history.replaceState(null, '', window.location.pathname);
@@ -403,7 +409,7 @@ export default function MichiganPulse() {
       const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token };
       setUser(newUser);
       await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
-      if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
+      if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
       loadUserVotes(uData.id, token);
       await loadAllVotes();
       setAuthModal(false);
@@ -443,7 +449,7 @@ export default function MichiganPulse() {
     if (prevMy) { newTotal = prevAgg.total - prevMy + score; newCount = prevAgg.count; }
     setVotes({ ...votes, [key]: { total: newTotal, count: newCount } });
     setUserVotes({ ...userVotes, [key]: score });
-    try { await sb.from('votes').upsert({ user_id: user.id, official_id: id, category: cat, score }); } catch(e) {}
+    try { await sb.from('votes', user.token).upsert({ user_id: user.id, official_id: id, category: cat, score }); } catch(e) {}
   };
 
   const submitComment = async (id) => {
@@ -454,7 +460,7 @@ export default function MichiganPulse() {
     const prev = comments[id] || [];
     setComments({ ...comments, [id]: [entry, ...prev].slice(0, 20) });
     setComment("");
-    try { await sb.from('comments').insert({ user_id: user.id, official_id: id, text }); } catch(e) {}
+    try { await sb.from('comments', user.token).insert({ user_id: user.id, official_id: id, text }); } catch(e) {}
     runAI(id, [entry, ...prev].slice(0, 20));
   };
 
@@ -479,7 +485,7 @@ export default function MichiganPulse() {
       const nai = { ...aiData, [id]: parsed };
       setAiData(nai);
       try {
-        await sb.from('ai_analyses').upsert({ official_id: id, sentiment: parsed.sentiment, score: parsed.score, themes: parsed.themes, summary: parsed.summary, updated_at: new Date().toISOString() });
+        await sb.from('ai_analyses', null).upsert({ official_id: id, sentiment: parsed.sentiment, score: parsed.score, themes: parsed.themes, summary: parsed.summary, updated_at: new Date().toISOString() });
       } catch(e) {}
     } catch(e) {}
     setAnalyzing(null);
@@ -522,7 +528,7 @@ export default function MichiganPulse() {
       updated[val] = (updated[val]||0)+1;
       setVotes({ ...votes, [poll.key]: updated });
       setUserVotes({ ...userVotes, [poll.key]: val });
-      try { await sb.from('poll_votes').upsert({ user_id: user.id, poll_key: poll.key, vote: val }); } catch(e) {}
+      try { await sb.from('poll_votes', user.token).upsert({ user_id: user.id, poll_key: poll.key, vote: val }); } catch(e) {}
     };
     return (
       <div style={{marginBottom:22,padding:"18px 22px",background:"linear-gradient(135deg,#00aaff0d,#3ddc840a)",border:`1px solid ${BLUE}33`,borderRadius:12,position:"relative",overflow:"hidden"}}>
