@@ -300,6 +300,7 @@ export default function MichiganPulse() {
               // Clean up URL
               window.history.replaceState(null, '', window.location.pathname);
               setTimeout(() => showRandomCartoon(), 500);
+              await loadAllVotes();
             }
           }
         } else {
@@ -404,6 +405,7 @@ export default function MichiganPulse() {
       await window.storage.set('mi_sb_user', JSON.stringify(newUser)).catch(()=>{});
       if (uData.id) await sb.from('users').upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
       loadUserVotes(uData.id, token);
+      await loadAllVotes();
       setAuthModal(false);
       setTimeout(() => showRandomCartoon(), 300);
     } catch(e) { setAuthError('Connection error. Please try again.'); }
