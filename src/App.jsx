@@ -449,7 +449,10 @@ export default function MichiganPulse() {
     if (prevMy) { newTotal = prevAgg.total - prevMy + score; newCount = prevAgg.count; }
     setVotes({ ...votes, [key]: { total: newTotal, count: newCount } });
     setUserVotes({ ...userVotes, [key]: score });
-    try { await sb.from('votes', user.token).upsert({ user_id: user.id, official_id: id, category: cat, score }); } catch(e) {}
+    try {
+      const result = await sb.from('votes', user.token).upsert({ user_id: user.id, official_id: id, category: cat, score });
+      console.log('Vote save result:', JSON.stringify(result));
+    } catch(e) { console.error('Vote save error:', e); }
   };
 
   const submitComment = async (id) => {
