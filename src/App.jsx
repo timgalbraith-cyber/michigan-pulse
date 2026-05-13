@@ -38,18 +38,18 @@ const sb = {
   }),
   auth: {
     signUp: async (email, password, name) => {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, { method: "POST", headers: sb.headers, body: JSON.stringify({ email, password, options: { data: { name } } }) });
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, { method: "POST", headers: sbHeaders(), body: JSON.stringify({ email, password, options: { data: { name } } }) });
       return r.json();
     },
     signIn: async (email, password) => {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, { method: "POST", headers: sb.headers, body: JSON.stringify({ email, password }) });
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, { method: "POST", headers: sbHeaders(), body: JSON.stringify({ email, password }) });
       return r.json();
     },
     signOut: async (token) => {
-      await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: "POST", headers: { ...sb.headers, "Authorization": `Bearer ${token}` } });
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`, { method: "POST", headers: sbHeaders(token) });
     },
     getUser: async (token) => {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { ...sb.headers, "Authorization": `Bearer ${token}` } });
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: sbHeaders(token) });
       return r.json();
     },
   },
