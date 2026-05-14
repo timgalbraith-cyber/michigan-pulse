@@ -656,34 +656,14 @@ export default function MichiganPulse() {
 
         {/* Social Links */}
         <div style={{display:"flex",gap:10,marginBottom:22,flexWrap:"wrap"}}>
-          <a href="https://www.facebook.com/HashtagLapeer" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:9,padding:"10px 18px",borderRadius:10,background:"#ffffff07",border:"1px solid #1877f222",textDecoration:"none",flex:"1 1 180px",cursor:"pointer"}}>
+          <a href="https://www.facebook.com/profile.php?id=61589569536616" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:9,padding:"10px 18px",borderRadius:10,background:"#ffffff07",border:"1px solid #1877f222",textDecoration:"none",flex:"1 1 180px",cursor:"pointer"}}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             <div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{fontSize:12,fontWeight:700,color:"#e0eeff"}}>Facebook</div>{IS_LIVE && LIVE_PLATFORM==="facebook" && <span style={{fontSize:9,fontWeight:800,color:"#ff4d4d",background:"#ff000022",border:"1px solid #ff000044",borderRadius:10,padding:"1px 6px",letterSpacing:1}}>LIVE</span>}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{fontSize:12,fontWeight:700,color:"#e0eeff"}}>Michigan Pulse</div>{IS_LIVE && LIVE_PLATFORM==="facebook" && <span style={{fontSize:9,fontWeight:800,color:"#ff4d4d",background:"#ff000022",border:"1px solid #ff000044",borderRadius:10,padding:"1px 6px",letterSpacing:1}}>LIVE</span>}</div>
               <div style={{fontSize:10,color:"#ffffff44"}}>Follow Hashtag w/ Timothy David Galbraith</div>
             </div>
           </a>
-          <a href="https://hashtaglapeer.substack.com/" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:9,padding:"10px 18px",borderRadius:10,background:"#ffffff07",border:"1px solid #ff671922",textDecoration:"none",flex:"1 1 180px",cursor:"pointer"}}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff6719"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
-            <div>
-              <div style={{fontSize:12,fontWeight:700,color:"#e0eeff"}}>Substack</div>
-              <div style={{fontSize:10,color:"#ffffff44"}}>Follow Hashtag w/ Timothy David Galbraith</div>
-            </div>
-          </a>
-          <a href="https://www.youtube.com/@Tim_Galbraith" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:9,padding:"10px 18px",borderRadius:10,background:"#ffffff07",border:"1px solid #ff000022",textDecoration:"none",flex:"1 1 180px",cursor:"pointer"}}>
-            <svg width="22" height="16" viewBox="0 0 24 17" fill="#ff0000"><path d="M23.495 2.205a3.02 3.02 0 0 0-2.122-2.136C19.505 0 12 0 12 0S4.495 0 2.627.069A3.02 3.02 0 0 0 .505 2.205 31.247 31.247 0 0 0 0 8.005a31.247 31.247 0 0 0 .505 5.8 3.02 3.02 0 0 0 2.122 2.136C4.495 16.01 12 16.01 12 16.01s7.505 0 9.373-.069a3.02 3.02 0 0 0 2.122-2.136A31.247 31.247 0 0 0 24 8.005a31.247 31.247 0 0 0-.505-5.8zM9.609 11.386V4.624l6.264 3.381-6.264 3.381z"/></svg>
-            <div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{fontSize:12,fontWeight:700,color:"#e0eeff"}}>YouTube</div>{IS_LIVE && LIVE_PLATFORM==="youtube" && <span style={{fontSize:9,fontWeight:800,color:"#ff4d4d",background:"#ff000022",border:"1px solid #ff000044",borderRadius:10,padding:"1px 6px",letterSpacing:1}}>LIVE</span>}</div>
-              <div style={{fontSize:10,color:"#ffffff44"}}>Follow Timothy David Galbraith</div>
-            </div>
-          </a>
-          <a href="https://x.com/TDGalbraith" target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:9,padding:"10px 18px",borderRadius:10,background:"#ffffff07",border:"1px solid #ffffff15",textDecoration:"none",flex:"1 1 180px",cursor:"pointer"}}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            <div>
-              <div style={{fontSize:12,fontWeight:700,color:"#e0eeff"}}>X (Twitter)</div>
-              <div style={{fontSize:10,color:"#ffffff44"}}>Follow Hashtag w/ Timothy David Galbraith</div>
-            </div>
-          </a>
+
         </div>
 
         {/* GEO POLL */}
