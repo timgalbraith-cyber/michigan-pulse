@@ -339,8 +339,6 @@ export default function MichiganPulse() {
       return () => clearTimeout(timer);
     }
   }, [user]);
-    })();
-  }, []);
 
   const detectRegion = async () => {
     try {
