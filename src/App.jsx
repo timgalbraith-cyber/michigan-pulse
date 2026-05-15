@@ -545,7 +545,8 @@ export default function MichiganPulse() {
         })
       });
       const data = await res.json();
-      const txt = data.content?.find(b => b.type === "text")?.text || "{}";
+      const data = await res.json();
+      console.log("AI raw response:", JSON.stringify(data));
       const parsed = JSON.parse(txt.replace(/```json|```/g,"").trim());
       const nai = { ...aiData, [id]: parsed };
       setAiData(nai);
