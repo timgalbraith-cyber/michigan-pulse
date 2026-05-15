@@ -277,6 +277,10 @@ export default function MichiganPulse() {
   const [authLoading, setAuthLoading] = useState(false);
   const [cartoonUrl, setCartoonUrl] = useState(null);
   const [videoBlocked, setVideoBlocked] = useState(false);
+  const [usernameModal, setUsernameModal] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameLoading, setUsernameLoading] = useState(false);
 
   const CARTOONS = [
     "https://res.cloudinary.com/dgczdb1um/video/upload/v1778623522/2026-05-12_16_49_45_swnqta.mp4",
@@ -326,6 +330,15 @@ export default function MichiganPulse() {
         detectRegion();
       } catch(e) { console.error('Load error', e); }
       setLoaded(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (user && (!user.username || user.username === user.name || user.username === user.email?.split('@')[0])) {
+      const timer = setTimeout(() => setUsernameModal(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
     })();
   }, []);
 
@@ -431,7 +444,11 @@ export default function MichiganPulse() {
       loadUserVotes(uData.id, token);
       await loadAllVotes();
       setAuthModal(false);
-      setTimeout(() => showRandomCartoon(), 300);
+      if (!username || username === name) {
+        setTimeout(() => setUsernameModal(true), 300);
+      } else {
+        setTimeout(() => showRandomCartoon(), 300);
+      }
     } catch(e) { setAuthError('Connection error. Please try again.'); }
     setAuthLoading(false);
     setAuthEmail(''); setAuthPass(''); setAuthName(''); setAuthUsername(''); setAuthError('');
@@ -455,6 +472,27 @@ export default function MichiganPulse() {
   const requireAuth = () => {
     if (!user) { setAuthModal(true); setAuthTab('login'); return false; }
     return true;
+  };
+
+  const saveUsername = async () => {
+    setUsernameError(''); setUsernameLoading(true);
+    const clean = newUsername.trim().replace(/[^a-zA-Z0-9_]/g,'');
+    if (clean.length < 3) { setUsernameError('Must be at least 3 characters.'); setUsernameLoading(false); return; }
+    // Check uniqueness
+    try {
+      const existing = await sb.from('users', null).select('id', { filter: `username=eq.${clean}` });
+      if (Array.isArray(existing) && existing.length > 0) { setUsernameError('That username is taken. Try another.'); setUsernameLoading(false); return; }
+      // Save to Supabase
+      await sb.from('users', user.token).upsert({ id: user.id, username: clean });
+      // Update local user
+      const updatedUser = { ...user, username: clean };
+      setUser(updatedUser);
+      try { localStorage.setItem('mi_sb_user', JSON.stringify(updatedUser)); } catch(e) {}
+      setUsernameModal(false);
+      setNewUsername('');
+      setTimeout(() => showRandomCartoon(), 300);
+    } catch(e) { setUsernameError('Error saving username. Try again.'); }
+    setUsernameLoading(false);
   };
 
   const castVote = async (id, cat, score) => {
@@ -912,6 +950,37 @@ export default function MichiganPulse() {
         </div>
       )}
 
+      {/* USERNAME MODAL */}
+      {usernameModal && (
+        <div style={{position:"fixed",inset:0,zIndex:998,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.85)",backdropFilter:"blur(8px)"}}>
+          <div style={{background:"#0a0f1a",border:`1px solid ${BLUE}33`,borderRadius:16,padding:"32px 28px",width:"100%",maxWidth:380,position:"relative"}}>
+            <div style={{textAlign:"center",marginBottom:24}}>
+              <div style={{fontSize:36,marginBottom:8}}>👤</div>
+              <div style={{fontSize:20,fontWeight:900,background:`linear-gradient(90deg,${BLUE},${GREEN})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Choose a Username</div>
+              <div style={{fontSize:12,color:"#ffffff44",marginTop:8,lineHeight:1.5}}>Pick a unique username that will appear on your comments. You can't change this later.</div>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              <div style={{position:"relative"}}>
+                <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"#ffffff44",fontSize:14,fontWeight:600}}>@</span>
+                <input
+                  value={newUsername}
+                  onChange={e=>setNewUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g,''))}
+                  placeholder="YourUsername"
+                  maxLength={20}
+                  onKeyDown={e=>e.key==='Enter'&&saveUsername()}
+                  style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px 10px 28px",color:"#e0eeff",fontSize:14,outline:"none",fontFamily:"inherit",width:"100%"}}
+                />
+              </div>
+              <div style={{fontSize:10,color:"#ffffff33"}}>Letters, numbers, underscores only. Min 3 characters.</div>
+              {usernameError && <div style={{fontSize:11,color:"#ff6b6b",padding:"6px 10px",background:"#ff000011",borderRadius:5,border:"1px solid #ff000022"}}>{usernameError}</div>}
+              <button className="btn" onClick={saveUsername} disabled={usernameLoading}
+                style={{marginTop:4,padding:"11px 0",borderRadius:8,background:usernameLoading?"#ffffff14":`linear-gradient(90deg,#0077bb,#28a05e)`,color:usernameLoading?"#ffffff44":"#fff",fontSize:13,fontWeight:700,border:"none",cursor:usernameLoading?"default":"pointer"}}>
+                {usernameLoading ? 'Checking...' : 'Set Username'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* CARTOON MODAL */}
       {cartoonUrl && (
         <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.85)",backdropFilter:"blur(10px)"}}>
