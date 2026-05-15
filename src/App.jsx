@@ -92,16 +92,17 @@ const OFFICIALS = [
   { id: "wise", name: "Greg Wise", title: "Commissioner, Dist. 6", party: "R", chamber: "Lapeer Co. Board", city: "", county: "lapeer", image: "GW2" },
   { id: "zender", name: "Bryan Zender", title: "Commissioner, Dist. 7", party: "R", chamber: "Lapeer Co. Board", city: "", county: "lapeer", image: "BZ" },
   // Local Judiciary
+  { id: "jhowell", name: "John Howell", title: "Chairman, Lapeer County Road Commission", party: "N", chamber: "Lapeer County", city: "", county: "lapeer", image: "JHW" },
   { id: "nolan", name: "Judge Michael Nolan", title: "40th Circuit Court", party: "N", chamber: "Local Judiciary", city: "", county: "lapeer", image: "MN" },
   { id: "hodges", name: "Judge Michael Hodges", title: "40th Circuit Court", party: "N", chamber: "Local Judiciary", city: "", county: "lapeer", image: "MH" },
   { id: "barnard", name: "Judge Laura Barnard", title: "71A District Court", party: "N", chamber: "Local Judiciary", city: "", county: "lapeer", image: "LB" },
   { id: "dmccarthy", name: "Judge Denis McCarthy", title: "Probate Court", party: "N", chamber: "Local Judiciary", city: "", county: "lapeer", image: "DMC" },
   // City of Lapeer
   { id: "hing", name: "Jeramy Hing", title: "Mayor, City of Lapeer", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "JH" },
-  { id: "atwood", name: "Commissioner Atwood", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "ATW" },
-  { id: "brady", name: "Commissioner Brady", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "BRD" },
-  { id: "glisman", name: "Commissioner Glisman", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "GLS" },
-  { id: "petrie", name: "Commissioner Petrie", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "PTR" },
+  { id: "atwood", name: "Josh Atwood", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "ATW" },
+  { id: "brady", name: "Stefan Brady", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "BRD" },
+  { id: "glisman", name: "Linda Glisman", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "GLS" },
+  { id: "petrie", name: "Melissa Petrie", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "PTR" },
   { id: "mccarthy", name: "Lynne McCarthy", title: "City Commissioner", party: "N", chamber: "City of Lapeer", city: "lapeer", county: "lapeer", image: "LM" },
   // City of Flint
   { id: "neeley", name: "Sheldon Neeley", title: "Mayor", party: "D", chamber: "City of Flint", city: "flint", county: "genesee", image: "SN" },
