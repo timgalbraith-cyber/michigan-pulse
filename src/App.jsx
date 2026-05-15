@@ -272,6 +272,7 @@ export default function MichiganPulse() {
   const [authEmail, setAuthEmail] = useState('');
   const [authPass, setAuthPass] = useState('');
   const [authName, setAuthName] = useState('');
+  const [authUsername, setAuthUsername] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [cartoonUrl, setCartoonUrl] = useState(null);
@@ -369,12 +370,12 @@ export default function MichiganPulse() {
 
   const loadAllComments = async () => {
     try {
-      const data = await sb.from('comments').select('official_id,text,created_at,id');
+      const data = await sb.from('comments').select('official_id,text,created_at,id,username');
       if (!Array.isArray(data)) return;
       const byOfficial = {};
       data.forEach(c => {
         if (!byOfficial[c.official_id]) byOfficial[c.official_id] = [];
-        byOfficial[c.official_id].unshift({ text: c.text, ts: new Date(c.created_at).getTime(), id: c.id });
+        byOfficial[c.official_id].unshift({ text: c.text, ts: new Date(c.created_at).getTime(), id: c.id, username: c.username });
       });
       setComments(byOfficial);
     } catch(e) {}
@@ -395,6 +396,14 @@ export default function MichiganPulse() {
     if (!authEmail.includes('@')) { setAuthError('Enter a valid email.'); setAuthLoading(false); return; }
     if (authPass.length < 6) { setAuthError('Password must be at least 6 characters.'); setAuthLoading(false); return; }
     if (mode === 'signup' && !authName.trim()) { setAuthError('Please enter your name.'); setAuthLoading(false); return; }
+    if (mode === 'signup' && !authUsername.trim()) { setAuthError('Please choose a username.'); setAuthLoading(false); return; }
+    if (mode === 'signup' && authUsername.trim().length < 3) { setAuthError('Username must be at least 3 characters.'); setAuthLoading(false); return; }
+    if (mode === 'signup') {
+      // Check username uniqueness
+      const clean = authUsername.trim().replace(/[^a-zA-Z0-9_]/g,'');
+      const existing = await sb.from('users', null).select('id', { filter: `username=eq.${clean}` });
+      if (Array.isArray(existing) && existing.length > 0) { setAuthError('That username is taken. Please choose another.'); setAuthLoading(false); return; }
+    }
     try {
       let res;
       if (mode === 'signup') {
@@ -407,17 +416,25 @@ export default function MichiganPulse() {
       const token = res.access_token;
       const uData = res.user || {};
       const name = uData.user_metadata?.name || authEmail.split('@')[0];
-      const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token };
+      let username = mode === 'signup' ? authUsername.trim().replace(/[^a-zA-Z0-9_]/g,'') : null;
+      // For login, fetch existing username from users table
+      if (mode === 'login' && uData.id) {
+        try {
+          const existing = await sb.from('users', token).select('username', { filter: `id=eq.${uData.id}` });
+          if (Array.isArray(existing) && existing[0]) username = existing[0].username;
+        } catch(e) {}
+      }
+      const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token, username: username || name };
       setUser(newUser);
       try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
-      if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email' }).catch(()=>{});
+      if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email', username: username || name }).catch(()=>{});
       loadUserVotes(uData.id, token);
       await loadAllVotes();
       setAuthModal(false);
       setTimeout(() => showRandomCartoon(), 300);
     } catch(e) { setAuthError('Connection error. Please try again.'); }
     setAuthLoading(false);
-    setAuthEmail(''); setAuthPass(''); setAuthName(''); setAuthError('');
+    setAuthEmail(''); setAuthPass(''); setAuthName(''); setAuthUsername(''); setAuthError('');
   };
 
   const handleSocialAuth = async (provider) => {
@@ -833,7 +850,10 @@ export default function MichiganPulse() {
                     {(comments[official.id]||[]).map(c=>(
                       <div key={c.id} style={{background:"#ffffff07",borderRadius:7,padding:"9px 11px",border:"1px solid #ffffff07"}}>
                         <p style={{fontSize:11,color:"#c8e0ff",lineHeight:1.55}}>{c.text}</p>
-                        <div style={{fontSize:9,color:"#ffffff1e",marginTop:4}}>{new Date(c.ts).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
+                        <div style={{display:"flex",gap:8,marginTop:4,alignItems:"center"}}>
+                          {c.username && <span style={{fontSize:9,color:BLUE,fontWeight:600}}>@{c.username}</span>}
+                          <span style={{fontSize:9,color:"#ffffff1e"}}>{new Date(c.ts).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -875,7 +895,8 @@ export default function MichiganPulse() {
               <div style={{flex:1,height:1,background:"#ffffff12"}}/>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:9}}>
-              {authTab==='signup' && <input value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Your name" style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px",color:"#e0eeff",fontSize:13,outline:"none",fontFamily:"inherit"}}/>}
+              {authTab==='signup' && <input value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Your full name" style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px",color:"#e0eeff",fontSize:13,outline:"none",fontFamily:"inherit"}}/>}
+              {authTab==='signup' && <input value={authUsername} onChange={e=>setAuthUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g,''))} placeholder="Username (e.g. LapeerVoter)" style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px",color:"#e0eeff",fontSize:13,outline:"none",fontFamily:"inherit"}}/>}
               <input value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="Email address" type="email" style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px",color:"#e0eeff",fontSize:13,outline:"none",fontFamily:"inherit"}}/>
               <input value={authPass} onChange={e=>setAuthPass(e.target.value)} placeholder="Password" type="password" onKeyDown={e=>e.key==='Enter'&&handleEmailAuth(authTab)} style={{background:"#ffffff09",border:`1px solid ${BLUE}22`,borderRadius:7,padding:"10px 12px",color:"#e0eeff",fontSize:13,outline:"none",fontFamily:"inherit"}}/>
               {authError && <div style={{fontSize:11,color:"#ff6b6b",padding:"6px 10px",background:"#ff000011",borderRadius:5,border:"1px solid #ff000022"}}>{authError}</div>}
