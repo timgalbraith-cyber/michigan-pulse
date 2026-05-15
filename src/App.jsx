@@ -340,12 +340,7 @@ export default function MichiganPulse() {
     })();
   }, []);
 
-  useEffect(() => {
-    if (user && (!user.username || user.username.trim() === '') && user.freshLogin) {
-      const timer = setTimeout(() => setUsernameModal(true), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [user]);
+  // Username modal triggered manually after login only - see handleEmailAuth and OAuth handler
 
   const detectRegion = async () => {
     try {
