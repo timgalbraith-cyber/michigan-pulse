@@ -320,8 +320,15 @@ export default function MichiganPulse() {
           const savedUser = await Promise.resolve(localStorage.getItem('mi_sb_user') ? {value: localStorage.getItem('mi_sb_user')} : null);
           if (savedUser) {
             const u = JSON.parse(savedUser.value);
-            setUser(u);
-            loadUserVotes(u.id, u.token);
+          try {
+            const profile = await sb.from('users', u.token).select('username', { filter: `id=eq.${u.id}` });
+            if (Array.isArray(profile) && profile[0]?.username) {
+              u.username = profile[0].username;
+              try { localStorage.setItem('mi_sb_user', JSON.stringify(u)); } catch(e) {}
+            }
+          } catch(e) {}
+          setUser(u);
+          loadUserVotes(u.id, u.token);
           }
         }
         await loadAllVotes();
@@ -334,7 +341,7 @@ export default function MichiganPulse() {
   }, []);
 
   useEffect(() => {
-    if (user && (!user.username || user.username === user.name || user.username === user.email?.split('@')[0])) {
+    if (user && (!user.username || user.username.trim() === '')) {
       const timer = setTimeout(() => setUsernameModal(true), 800);
       return () => clearTimeout(timer);
     }
