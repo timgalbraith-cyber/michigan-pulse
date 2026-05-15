@@ -313,7 +313,7 @@ export default function MichiganPulse() {
               const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token, username, freshLogin: !username };
               setUser(newUser);
               try { const {freshLogin, ...userToSave} = newUser; localStorage.setItem('mi_sb_user', JSON.stringify(userToSave)); } catch(e) {}
-              if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
+              if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google', ...(username ? {username} : {}) }).catch(()=>{});
               loadUserVotes(uData.id, token);
               // Clean up URL
               window.history.replaceState(null, '', window.location.pathname);
