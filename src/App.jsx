@@ -304,7 +304,7 @@ export default function MichiganPulse() {
             const uData = await sb.auth.getUser(token);
             if (uData && uData.id) {
               const name = uData.user_metadata?.name || uData.email?.split('@')[0] || 'User';
-              const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token };
+              const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token, freshLogin: true };
               setUser(newUser);
               try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
               if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
@@ -341,7 +341,7 @@ export default function MichiganPulse() {
   }, []);
 
   useEffect(() => {
-    if (user && (!user.username || user.username.trim() === '')) {
+    if (user && (!user.username || user.username.trim() === '') && user.freshLogin) {
       const timer = setTimeout(() => setUsernameModal(true), 800);
       return () => clearTimeout(timer);
     }
@@ -442,7 +442,7 @@ export default function MichiganPulse() {
           if (Array.isArray(existing) && existing[0]) username = existing[0].username;
         } catch(e) {}
       }
-      const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token, username: username || name };
+      const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token, username: username || name, freshLogin: true };
       setUser(newUser);
       try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
       if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email', username: username || name }).catch(()=>{});
