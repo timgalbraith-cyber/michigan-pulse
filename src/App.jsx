@@ -783,7 +783,7 @@ export default function MichiganPulse() {
             const ai=aiData[o.id];
             const pc=partyColor(o.party);
             return(
-              <div key={o.id} className="card fu" style={{animationDelay:`${i*.03}s`,background:C.card,border:C.border,borderRadius:12,padding:16,position:"relative",overflow:"hidden"}} onClick={()=>{setSelId(o.id);setView("detail");}}>
+              <div key={o.id} className="card fu" style={{animationDelay:`${i*.03}s`,background:C.card,border:C.border,borderRadius:12,padding:16,position:"relative",overflow:"hidden"}} onClick={()=>{ setSelId(o.id); setView("detail"); const existing = comments[o.id] || []; if (existing.length > 0 && !aiData[o.id]) { setTimeout(() => runAI(o.id, existing), 500); } }}>
                 <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${pc}99,${pc}11)`}}/>
                 <div style={{display:"flex",alignItems:"center",gap:11,marginBottom:12}}>
                   <div style={{width:42,height:42,borderRadius:"50%",flexShrink:0,background:`radial-gradient(circle,${pc}2e 0%,${pc}0e 100%)`,border:`2px solid ${pc}55`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:pc}}>{o.image}</div>
