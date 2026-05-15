@@ -545,7 +545,6 @@ export default function MichiganPulse() {
         })
       });
       const data = await res.json();
-      console.log("AI raw response:", JSON.stringify(data));
       const txt = data.content?.find(b => b.type === "text")?.text || "{}";
       const parsed = JSON.parse(txt.replace(/```json|```/g,"").trim());
       const nai = { ...aiData, [id]: parsed };
@@ -827,7 +826,7 @@ export default function MichiganPulse() {
                 <div style={{fontSize:12,color:C.sub,marginTop:3}}>{official.title} · {partyLabel(official.party)} · {official.chamber}</div>
               </div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:16}}>
               <div style={{background:C.card,border:`1px solid ${BLUE}22`,borderRadius:12,padding:20}}>
                 <h3 style={{fontSize:15,fontWeight:700,color:BLUE,marginBottom:16}}>Rate This Official</h3>
                 <div style={{display:"flex",gap:5,marginBottom:16,flexWrap:"wrap"}}>
