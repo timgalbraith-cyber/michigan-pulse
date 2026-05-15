@@ -515,11 +515,11 @@ export default function MichiganPulse() {
     if (!requireAuth()) return;
     if (!comment.trim()) return;
     const text = comment.trim();
-    const entry = { text, ts: Date.now(), id: Math.random().toString(36).slice(2) };
+    const entry = { text, ts: Date.now(), id: Math.random().toString(36).slice(2), username: user.username || user.name };
     const prev = comments[id] || [];
     setComments({ ...comments, [id]: [entry, ...prev].slice(0, 20) });
     setComment("");
-    try { await sb.from('comments', user.token).insert({ user_id: user.id, official_id: id, text }); } catch(e) {}
+    try { await sb.from('comments', user.token).insert({ user_id: user.id, official_id: id, text, username: user.username || user.name }); } catch(e) {}
     runAI(id, [entry, ...prev].slice(0, 20));
   };
 
