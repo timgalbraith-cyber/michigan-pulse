@@ -306,7 +306,7 @@ export default function MichiganPulse() {
               const name = uData.user_metadata?.name || uData.email?.split('@')[0] || 'User';
               const newUser = { id: uData.id, name, email: uData.email, avatar: name.slice(0,2).toUpperCase(), token, freshLogin: true };
               setUser(newUser);
-              try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
+              try { const {freshLogin, ...userToSave} = newUser; localStorage.setItem('mi_sb_user', JSON.stringify(userToSave)); } catch(e) {}
               if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'google' }).catch(()=>{});
               loadUserVotes(uData.id, token);
               // Clean up URL
@@ -444,7 +444,7 @@ export default function MichiganPulse() {
       }
       const newUser = { id: uData.id, name, email: uData.email || authEmail, avatar: name.slice(0,2).toUpperCase(), token, username: username || name, freshLogin: true };
       setUser(newUser);
-      try { localStorage.setItem('mi_sb_user', JSON.stringify(newUser)); } catch(e) {}
+      try { const {freshLogin, ...userToSave} = newUser; localStorage.setItem('mi_sb_user', JSON.stringify(userToSave)); } catch(e) {}
       if (uData.id) await sb.from('users', token).upsert({ id: uData.id, name, email: uData.email, provider: 'email', username: username || name }).catch(()=>{});
       loadUserVotes(uData.id, token);
       await loadAllVotes();
